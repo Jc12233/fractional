@@ -18,7 +18,6 @@ function [h_est, support_set] = omp_fast(r, Psi, N_iter, epsilon, M, N, G_t, d_d
     support_set_int = [];               % 支撑集
     support_set = [];
     A = [];
-    A_iter = [];
 
     gamma_L = diag(exp(-1i * 2 * pi * (0:M*N-1)/(M*N)));  % 延迟相位移动
     Delta_K = diag(exp(1i * 2 * pi * (0:M*N-1)/(M*N)));   % 多普勒相位移动
@@ -44,7 +43,7 @@ function [h_est, support_set] = omp_fast(r, Psi, N_iter, epsilon, M, N, G_t, d_d
         % 生成小字典        
         Psi_part = partial_dictionary(l_int, k_int, gamma_L, Delta_K,F_MN, F_N, G_t, d_dd);
         % 
-        proj_part = Psi_part' * r_n;
+        proj_part = Psi_part(1:size(Psi,1),:)' * r_n;
         [~, idx_part] = max(abs(proj_part));
         indices_part_min = mod(idx_part, N):N:(M*N-N+mod(idx_part,N));
 
@@ -71,6 +70,21 @@ function [h_est, support_set] = omp_fast(r, Psi, N_iter, epsilon, M, N, G_t, d_d
         [k_frac_ind, l_frac_ind] = ind2sub([M, N], indices_part_min(idx_min));
         l_frac = l_int-1 + (l_frac_ind-1)*2/M;
         k_frac = k_int-1 + (k_frac_ind-1)*2/N;
+        % find the neighbour to get rid of the effect of other objects.
+        for l = 1:3
+            for k = 1:2:3
+                Psi_neigh(:,(l-1)*2+k) = F_MN' * (gamma_L^l_frac+2/M*(l-2)) * F_MN * (Delta_K^(k_frac+2/N*(k-1))) * kron(F_N',G_t)*d_dd;
+            end
+        end
+        Psi_min_neigh = [Psi_neigh,Psi_min_part(:,idx_min)];
+        proj_neigh = [Psi_min_neigh(1:size(Psi,1),:)]' * r_n;
+        [~,idx_neigh] = max(abs(proj_neigh));
+        if idx_neigh~=7
+            [k_neigh, l_neigh] = ind2sub([2, 3], idx_neigh);
+            l_frac = l_frac+2/N*(l_neigh-2);
+            k_frac = k_frac+2/N*(2*k_neigh-3);
+        end
+        
         disp('omp_fast用时:');
         toc;
 
@@ -88,14 +102,14 @@ function [h_est, support_set] = omp_fast(r, Psi, N_iter, epsilon, M, N, G_t, d_d
             end
         end
 
-        A = [A,Psi_min_part(1:size(Psi,1), idx_min)];  % 使用分数字典更新近似矩阵
+        A = [A,Psi_min_neigh(1:size(Psi,1), idx_neigh)];  % 使用分数字典更新近似矩阵
         x = pinv(A)* r;  % 重新计算稀疏向量估计
         % 更新残差
         r_n = r - A * x;
 
         % h_est_rel(iter,:) = [l_frac_rel, k_frac_rel];
         h_est(iter,:) = [l_frac, k_frac];  % 更新稀疏向量估计
-        norm(r_n);
+        norm(r_n)
         % 检查停止准则
         if norm(r_n) < epsilon
             break;
