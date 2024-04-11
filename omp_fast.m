@@ -88,20 +88,6 @@ function [h_est, support_set] = omp_fast(r, Psi, N_iter, epsilon, M, N, G_t, d_d
         disp('omp_fast用时:');
         toc;
 
-        % iter
-        indices_min_iter(iter,:) = indices_part_min; 
-        Psi_iter(:,:,iter) = Psi_min_part(1:size(Psi,1), :);
-        if iter~= 1
-            for i = 1:M
-                for j =1:M
-                    A_iter = [Psi_iter(:,i,1),Psi_iter(:,j,2)];
-                    x_iter = pinv(A_iter)*r;
-                    r_iter = r-A_iter*x_iter;
-                    val_iter(i,j) = norm(r_iter); 
-                end
-            end
-        end
-
         A = [A,Psi_min_neigh(1:size(Psi,1), idx_neigh)];  % 使用分数字典更新近似矩阵
         x = pinv(A)* r;  % 重新计算稀疏向量估计
         % 更新残差
@@ -165,20 +151,4 @@ function Psi_min = min_dictionary(l_int, k_int, gamma_L, Delta_K,F_MN, F_N,G_t,d
     end
 end
 
-function relevant_indices = get_relevant_indices(idx, N, matrix_size)
-    div = 4;
-    % 获取包括该列周围共 N/4 列的列序号
-    relevant_indices = [];
-
-    % 获取每隔 N 列共 N/4 个列序号
-    gap_indices = max(mod(idx-N/div*N,N), idx - N/div*N):N:min(idx+(N/div-1)*N, matrix_size-N+mod(idx,N));
-    for i = 1:length(gap_indices)
-        % 计算边界值
-        left_boundary = max(1, gap_indices(i) - N/div);
-        right_boundary = min(matrix_size, gap_indices(i) + N/div-1);
-        % 添加左侧列序号到结果集合
-        relevant_indices = [relevant_indices, left_boundary:right_boundary];
-    end
-
-end
 
