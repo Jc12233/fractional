@@ -6,7 +6,7 @@ N = 16;                         % 多普勒 bins 数量
 T = 1e-6;                       % 符号持续时间，单位：s
 T_guard = 0.1 * T;              % 保护间隔时间，单位：s
 
-K = 2;                          % 目标数量
+K = 4;                          % 目标数量
 
 c = 3e8;                        % 光速，单位：m/s
 fc = 24e9;                      % 载波频率，单位：Hz
@@ -25,8 +25,8 @@ range_data                      = [33.75, 50.625, 71.25, 97.5];                 
 normalized_delay_data           = range_data/delta_R;           % 归一化延迟
 velocity_data                   = 4*[7.63, 38.15, 7.63, -30.52];               % 速度（m/s）
 normalized_doppler_shift_data   = N/2+velocity_data/delta_V; % 归一化多普勒频移（Hz）
-snr_data                        = [20, 15, 10, 5];                                 % 信噪比（dB）
-signal_pow                      = sqrt(10*log10(snr_data)*sigma2);
+snr_data                        = [20, 0, 10, 5];                                 % 信噪比（dB）
+signal_pow                      = sqrt(10.^(snr_data/10)*sigma2);
 
 % % 将归一化延迟和归一化多普勒频移转换为实际值
 % delay = normalized_delay_data * (T / M);
@@ -65,7 +65,7 @@ Phi = construct_dictionary(M, N, G_t, D_dd);
 %Phi = load('data\parameter32.mat').Phi;      % 读取存储数据
 Phi_truncated = Phi(1:R, :);  % 对字典进行截断
 r_truncated = r(1:R);  % 对接收信号进行截断
-% h_est_fast = omp_fast(r_truncated, Phi_truncated, N_ite, epsilon, M, N, G_t, D_dd(:));
+h_est_fast = omp_fast(r_truncated, Phi_truncated, N_ite, epsilon, M, N, G_t, D_dd(:));
 % h_int =  omp(r_truncated, Phi_truncated, N_ite, epsilon, M, N);
 h_estimate = ompfr_1(r_truncated, Phi_truncated, N_ite, epsilon, M, N, G_t, D_dd(:));
 
