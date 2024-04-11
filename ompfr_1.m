@@ -55,7 +55,7 @@ function [h_est, support_set] = ompfr_1(r, Psi, N_iter, epsilon, M, N, G_t, d_dd
         toc;
         
         %%
-        Psi_tmp(:,idx) = Psi_frac(1:size(Psi,1),idx_frac);
+        % Psi_tmp(:,idx) = Psi_frac(1:size(Psi,1),idx_frac);
         %%
 
         relevant_indices = get_relevant_indices(idx_frac, N, M*N);
