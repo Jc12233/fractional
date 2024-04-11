@@ -73,7 +73,7 @@ function [h_est, support_set] = omp_fast(r, Psi, N_iter, epsilon, M, N, G_t, d_d
         % find the neighbour to get rid of the effect of other objects.
         for l = 1:3
             for k = 1:2:3
-                Psi_neigh(:,(l-1)*2+k) = F_MN' * (gamma_L^l_frac+2/M*(l-2)) * F_MN * (Delta_K^(k_frac+2/N*(k-1))) * kron(F_N',G_t)*d_dd;
+                Psi_neigh(:,(l-1)*2+(k+1)/2) = F_MN' * (gamma_L^(l_frac+2/M*(l-2))) * F_MN * (Delta_K^(k_frac+2/N*(2*k-3))) * kron(F_N',G_t)*d_dd;
             end
         end
         Psi_min_neigh = [Psi_neigh,Psi_min_part(:,idx_min)];
