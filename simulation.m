@@ -23,9 +23,9 @@ epsilon = N*M*sigma2;     % 残差阈值
 % 物体数据
 range_data                      = [33.75, 50.625, 71.25, 97.5];                 % 距离（m）
 normalized_delay_data           = range_data/delta_R;           % 归一化延迟
-velocity_data                   = 4*[7.63, 38.15, 7.63, -30.52];               % 速度（m/s）
+velocity_data                   = [7.63, 38.15, 7.63, -30.52];               % 速度（m/s）
 normalized_doppler_shift_data   = N/2+velocity_data/delta_V; % 归一化多普勒频移（Hz）
-snr_data                        = [20, 15, 10, 5];                                 % 信噪比（dB）
+snr_data                        = [20, 0, 10, 5];                                 % 信噪比（dB）
 signal_pow                      = sqrt(10.^(snr_data/10)*sigma2);
 
 % % 将归一化延迟和归一化多普勒频移转换为实际值
@@ -33,7 +33,8 @@ signal_pow                      = sqrt(10.^(snr_data/10)*sigma2);
 % velocity = normalized_doppler_shift_data * (delta_V / N);
 
 % 生成随机发送数据
-D_dd = randi([0, 1], M, N);
+D_dd = 2*randi([0, 1], M, N)-1;
+D_dd = ones(M,N);
 
 % 使用给定的目标参数
 h_k = signal_pow';            % 目标增益
@@ -41,7 +42,7 @@ l_tau = normalized_delay_data';               % 整数延迟
 k_nu = normalized_doppler_shift_data';                 % 整数多普勒
 
 % 发送 OTFS 信号
-G_t = eye(N);               % 发送脉冲塑形矩阵
+G_t = eye(M);               % 发送脉冲塑形矩阵
 % G_t = gaussian_pulse_matrix(N,N,T);
 s = generate_OTFS_signal(D_dd, M, N, G_t);
 
@@ -65,7 +66,8 @@ Phi = construct_dictionary(M, N, G_t, D_dd);
 %Phi = load('data\parameter32.mat').Phi;      % 读取存储数据
 Phi_truncated = Phi(1:R, :);  % 对字典进行截断
 r_truncated = r(1:R);  % 对接收信号进行截断
-h_est_fast = omp_fast(r_truncated, Phi_truncated, N_ite, epsilon, M, N, G_t, D_dd(:));
+% h_est_gold = omp_gold(r_truncated, Phi_truncated, N_ite, epsilon, M, N, G_t, D_dd(:));
+% h_est_fast = omp_fast(r_truncated, Phi_truncated, N_ite, epsilon, M, N, G_t, D_dd(:));
 % h_int =  omp(r_truncated, Phi_truncated, N_ite, epsilon, M, N);
 h_estimate = ompfr_1(r_truncated, Phi_truncated, N_ite, epsilon, M, N, G_t, D_dd(:));
 
