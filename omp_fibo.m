@@ -18,6 +18,7 @@ function [h_est, support_set] = omp_fibo(r, Psi, N_iter, epsilon, M, N, G_t, d_d
     support_set_int = [];               % 支撑集
     support_set = [];
     A = [];
+    G_r = G_t;
 
     gamma_L = diag(exp(-1i * 2 * pi * (0:M*N-1)/(M*N)));  % 延迟相位移动
     Delta_K = diag(exp(1i * 2 * pi * (0:M*N-1)/(M*N)));   % 多普勒相位移动
@@ -39,21 +40,11 @@ function [h_est, support_set] = omp_fibo(r, Psi, N_iter, epsilon, M, N, G_t, d_d
         l_int = l_int-1;
         k_int = k_int-1;
 
-        indices_part_min = N/2:N:M*N-N/2;
-
-        % 生成最小值字典
-        Psi_min_part = l_dictionary(l_int, k_int, gamma_L, Delta_K,F_MN, F_N, G_t, d_dd,indices_part_min);
-        proj_min = Psi_min_part(1:size(Psi,1),:)' * r_n; 
-        [~, idx_min] = max(abs(proj_min));
-
-        [k_frac_ind, l_frac_ind] = ind2sub([M, N], indices_part_min(idx_min));
-        l_frac_m = l_int-1 + (l_frac_ind-1)*2/M;
-        k_frac_m = k_int-1 + (k_frac_ind-1)*2/N;
         % 黄金分割比一维搜索
-        l_left = l_frac_m - 0.25;
-        l_right = l_frac_m + 0.25;
-        k_left = k_frac_m - 0.25;
-        k_right = k_frac_m + 0.25;
+        l_left = l_int - 1;
+        l_right = l_int + 1;
+        k_left = k_int - 1;
+        k_right = k_int + 1;
         N_i = 50;
         fi = fib(N_i+3);
         for i = 1:N_i
@@ -70,10 +61,10 @@ function [h_est, support_set] = omp_fibo(r, Psi, N_iter, epsilon, M, N, G_t, d_d
 
             
             % 初始函数值
-            phi_11 = F_MN' * (gamma_L^l_x1) * F_MN * (Delta_K^k_x1) * kron(F_N',G_t)*d_dd;
-            phi_12 = F_MN' * (gamma_L^l_x1) * F_MN * (Delta_K^k_x2) * kron(F_N',G_t)*d_dd;
-            phi_21 = F_MN' * (gamma_L^l_x2) * F_MN * (Delta_K^k_x1) * kron(F_N',G_t)*d_dd;
-            phi_22 = F_MN' * (gamma_L^l_x2) * F_MN * (Delta_K^k_x2) * kron(F_N',G_t)*d_dd;
+            phi_11 = kron(F_N,G_r)*F_MN' * (gamma_L^l_x1) * F_MN * (Delta_K^k_x1) * kron(F_N',G_t)*d_dd;
+            phi_12 = kron(F_N,G_r)*F_MN' * (gamma_L^l_x1) * F_MN * (Delta_K^k_x2) * kron(F_N',G_t)*d_dd;
+            phi_21 = kron(F_N,G_r)*F_MN' * (gamma_L^l_x2) * F_MN * (Delta_K^k_x1) * kron(F_N',G_t)*d_dd;
+            phi_22 = kron(F_N,G_r)*F_MN' * (gamma_L^l_x2) * F_MN * (Delta_K^k_x2) * kron(F_N',G_t)*d_dd;
 
             f11 = phi_11'*r_n;
             f12 = phi_12'*r_n;
@@ -125,41 +116,5 @@ function b = fib(k)
     b(2) = 1;
     for i = 3:k
         b(i) = b(i-1)+b(i-2);
-    end
-end
-function Psi_min = l_dictionary(l_int, k_int, gamma_L, Delta_K,F_MN, F_N,G_t,d_dd,indices)
-    N = size(F_N,1);
-    M = size(F_MN,1)/N;
-    
-    Psi_min = zeros(M*N, M);
-    index = 1;
-
-    for index = 1:length(indices)  % 多普勒索引范围
-
-        % 延迟和多普勒的总值
-        tau = l_int -1 + (index-1)*2/M ;
-        nu = (k_int -1 + (indices(1)-1)*2/N);
-
-        % 计算每一列，根据公式(11)
-        Psi_min(:, index) = F_MN' * (gamma_L^tau) * F_MN * (Delta_K^nu) * kron(F_N',G_t)*d_dd;
-
-    end
-end
-function Psi_min = k_dictionary(l_int, k_int, gamma_L, Delta_K,F_MN, F_N,G_t,d_dd,indices)
-    N = size(F_N,1);
-    M = size(F_MN,1)/N;
-    
-    Psi_min = zeros(M*N, M);
-    index = 1;
-
-    for index = 1:length(indices)  % 多普勒索引范围
-
-        % 延迟和多普勒的总值
-        tau = l_int -1 + (indices(1)-1)*2/M ;
-        nu = (k_int -1 + (index-1)*2/N);
-
-        % 计算每一列，根据公式(11)
-        Psi_min(:, index) = F_MN' * (gamma_L^tau) * F_MN * (Delta_K^nu) * kron(F_N',G_t)*d_dd;
-
     end
 end
