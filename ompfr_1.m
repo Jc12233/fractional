@@ -42,9 +42,9 @@ function [h_est, support_set] = ompfr_1(r, Psi, N_iter, epsilon, M, N, G_t, d_dd
         
         tic;
         % 生成分数字典        
-        Psi_frac = fractional_dictionary(Psi, l_int, k_int, gamma_L, Delta_K,F_MN, F_N, G_t, d_dd);
+        Psi_frac = fractional_dictionary(l_int, k_int, gamma_L, Delta_K,F_MN, F_N, G_t, d_dd);
         % 在分数字典上进行投影并找到最大索引
-        
+
         proj_frac = Psi_frac(1:size(Psi,1),:)' * r_n; 
         
         [~, idx_frac] = max(abs(proj_frac));
@@ -114,7 +114,7 @@ function [h_est, support_set] = ompfr_1(r, Psi, N_iter, epsilon, M, N, G_t, d_dd
     end
 end
 
-function Psi_frac = fractional_dictionary(Psi, l_int, k_int, gamma_L, Delta_K,F_MN, F_N,G_t,d_dd)
+function Psi_frac = fractional_dictionary(l_int, k_int, gamma_L, Delta_K,F_MN, F_N,G_t,d_dd)
     % 基于整数和分数延迟及多普勒生成分数字典
     % Psi: 整数字典
     % l_int, k_int: 延迟和多普勒的整数部分
@@ -122,7 +122,7 @@ function Psi_frac = fractional_dictionary(Psi, l_int, k_int, gamma_L, Delta_K,F_
     % G_t: 发射脉冲形状矩阵
     N = size(F_N,1);
     M = size(F_MN,1)/N;
-    
+    G_r = G_t;
     Psi_frac = zeros(M*N, M * N);
     index = 1;
 
@@ -134,12 +134,13 @@ function Psi_frac = fractional_dictionary(Psi, l_int, k_int, gamma_L, Delta_K,F_
             nu = (k_int + n);
 
             % 计算每一列，根据公式(11)
-            Psi_frac(:, index) = F_MN' * (gamma_L^tau) * F_MN * (Delta_K^nu) * kron(F_N',G_t)*d_dd;
+            Psi_frac(:, index) = kron(F_N,G_r)*F_MN' * (gamma_L^tau) * F_MN * (Delta_K^nu) * kron(F_N',G_t)*d_dd;
             
             index = index + 1;
         end
     end
 end
+
 
 function relevant_indices = get_relevant_indices(idx, N, matrix_size)
     div = 4;
