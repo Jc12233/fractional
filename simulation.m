@@ -33,6 +33,7 @@ signal_pow                      = sqrt(10.^(snr_data/10)*sigma2);
 % velocity = normalized_doppler_shift_data * (delta_V / N);
 
 % 生成随机发送数据
+rng(1,'twister');
 D_dd = 2*randi([0, 1], M, N)-1;
 
 
