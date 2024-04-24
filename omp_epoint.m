@@ -1,4 +1,4 @@
-function [h_est, support_set] = omp_epoint(r, Psi, N_iter, epsilon, M, N, G_t, d_dd)
+function [h_est, support_set] = omp_epoint(r, Psi, N_iter, epsilon, M, N, G_r,G_t, d_dd)
 % OMPFR - Orthogonal Matching Pursuit with Fractional Refinement
 %
 % 参数:
@@ -18,7 +18,6 @@ function [h_est, support_set] = omp_epoint(r, Psi, N_iter, epsilon, M, N, G_t, d
     support_set_int = [];               % 支撑集
     support_set = [];
     Phi_sel = [];
-    G_r = G_t;
 
     gamma_L = diag(exp(-1i * 2 * pi * (0:M*N-1)/(M*N)));  % 延迟相位移动
     Delta_K = diag(exp(1i * 2 * pi * (0:M*N-1)/(M*N)));   % 多普勒相位移动
@@ -57,12 +56,11 @@ function [h_est, support_set] = omp_epoint(r, Psi, N_iter, epsilon, M, N, G_t, d
             delay_l = exp(-1i * 2 * pi * (0:M * N-1)/(M * N));
             doppler_k = exp(1i * 2 * pi * (0:M * N-1)/(M * N));
             l_right = l_tmp+1/ind;
-            l_left = l_tmp-1/ind;
+            l_left = max(l_tmp-1/ind,0);
             k_right = k_tmp+1/ind;
             k_left = k_tmp-1/ind;
     
 
-    
             for i = 1:N_i
                 rho = 0.618;    % 黄金分割比例
                
@@ -103,6 +101,7 @@ function [h_est, support_set] = omp_epoint(r, Psi, N_iter, epsilon, M, N, G_t, d
             l_tmp = l_frac;
             k_tmp = k_frac;
         end
+        disp("omp_epoint用时：");
         toc;
         phi = kron(F_N,G_r)*F_MN' * (gamma_L^l_frac) * F_MN * (Delta_K^k_frac) * kron(F_N',G_t)*d_dd;
         Phi_sel = [Phi_sel,phi];  % 使用分数字典更新近似矩阵
