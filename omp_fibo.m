@@ -1,4 +1,4 @@
-function [h_est, support_set] = omp_fibo(r, Psi, N_iter, epsilon, M, N, G_t, d_dd)
+function [h_est, support_set] = omp_fibo(r, Psi, N_iter, epsilon, M, N, G_r,G_t, d_dd)
 % OMPFR - Orthogonal Matching Pursuit with Fractional Refinement
 %
 % 参数:
@@ -18,7 +18,6 @@ function [h_est, support_set] = omp_fibo(r, Psi, N_iter, epsilon, M, N, G_t, d_d
     support_set_int = [];               % 支撑集
     support_set = [];
     A = [];
-    G_r = G_t;
 
     gamma_L = diag(exp(-1i * 2 * pi * (0:M*N-1)/(M*N)));  % 延迟相位移动
     Delta_K = diag(exp(1i * 2 * pi * (0:M*N-1)/(M*N)));   % 多普勒相位移动
@@ -94,6 +93,7 @@ function [h_est, support_set] = omp_fibo(r, Psi, N_iter, epsilon, M, N, G_t, d_d
                 break;
             end
         end
+        disp("ompfr_fibo用时：");
         toc;
         l_frac = (l_left+l_right)/2;
         k_frac = (k_left+k_right)/2;

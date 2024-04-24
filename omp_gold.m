@@ -1,4 +1,4 @@
-function [h_est, support_set] = omp_gold(r, Psi, N_iter, epsilon, M, N, G_t, d_dd)
+function [h_est, support_set] = omp_gold(r, Psi, N_iter, epsilon, M, N, G_r,G_t, d_dd)
 % OMPFR - Orthogonal Matching Pursuit with Fractional Refinement
 %
 % 参数:
@@ -18,12 +18,14 @@ function [h_est, support_set] = omp_gold(r, Psi, N_iter, epsilon, M, N, G_t, d_d
     support_set_int = [];               % 支撑集
     support_set = [];
     A = [];
-    G_r = G_t;
 
     gamma_L = diag(exp(-1i * 2 * pi * (0:M*N-1)/(M*N)));  % 延迟相位移动
     Delta_K = diag(exp(1i * 2 * pi * (0:M*N-1)/(M*N)));   % 多普勒相位移动
     F_MN = dftmtx(M*N);
     F_N = dftmtx(N);
+
+    phi_left = kron(F_N,G_r)*F_MN';
+    phi_right = kron(F_N',G_t)*d_dd;
 
     % 迭代过程
     for iter = 1:N_iter
@@ -39,7 +41,8 @@ function [h_est, support_set] = omp_gold(r, Psi, N_iter, epsilon, M, N, G_t, d_d
         [k_int, l_int] = ind2sub([M, N], idx);
         l_int = l_int-1;
         k_int = k_int-1;
-
+        
+        tic;
         % 黄金分割比一维搜索
         l_left = l_int - 1;
         l_right = l_int + 1;
@@ -61,17 +64,17 @@ function [h_est, support_set] = omp_gold(r, Psi, N_iter, epsilon, M, N, G_t, d_d
 
             
             % 初始函数值
-            phi_11 = kron(F_N,G_r)*F_MN' * (gamma_L^l_x1) * F_MN * (Delta_K^k_x1) * kron(F_N',G_t)*d_dd;
-            phi_12 = kron(F_N,G_r)*F_MN' * (gamma_L^l_x1) * F_MN * (Delta_K^k_x2) * kron(F_N',G_t)*d_dd;
-            phi_21 = kron(F_N,G_r)*F_MN' * (gamma_L^l_x2) * F_MN * (Delta_K^k_x1) * kron(F_N',G_t)*d_dd;
-            phi_22 = kron(F_N,G_r)*F_MN' * (gamma_L^l_x2) * F_MN * (Delta_K^k_x2) * kron(F_N',G_t)*d_dd;
+            phi_11 = phi_left * (gamma_L^l_x1) * F_MN * (Delta_K^k_x1) * phi_right;
+            phi_12 = phi_left * (gamma_L^l_x1) * F_MN * (Delta_K^k_x2) * phi_right;
+            phi_21 = phi_left * (gamma_L^l_x2) * F_MN * (Delta_K^k_x1) * phi_right;
+            phi_22 = phi_left * (gamma_L^l_x2) * F_MN * (Delta_K^k_x2) * phi_right;
 
             f11 = phi_11'*r_n;
             f12 = phi_12'*r_n;
             f21 = phi_21'*r_n;
             f22 = phi_22'*r_n;
             
-            [~,ind] = max([f11,f12,f21,f22]);
+            [~,ind] = max(abs([f11,f12,f21,f22]));
             if ind == 1
                 l_right = l_x2;
                 k_right = k_x2;
@@ -93,6 +96,8 @@ function [h_est, support_set] = omp_gold(r, Psi, N_iter, epsilon, M, N, G_t, d_d
                 break;
             end
         end
+        disp("omp_gold用时：");
+        toc;
         l_frac = (l_left+l_right)/2;
         k_frac = (k_left+k_right)/2;
         A = [A,phi];  % 使用分数字典更新近似矩阵

@@ -1,4 +1,4 @@
-function [h_est, support_set] = ompfr_1(r, Psi, N_iter, epsilon, M, N, G_t, d_dd)
+function [h_est, support_set] = ompfr_1(r, Psi, N_iter, epsilon, M, N, G_r,G_t, d_dd)
 % OMPFR - Orthogonal Matching Pursuit with Fractional Refinement
 %
 % 参数:
@@ -42,7 +42,7 @@ function [h_est, support_set] = ompfr_1(r, Psi, N_iter, epsilon, M, N, G_t, d_dd
         
         tic;
         % 生成分数字典        
-        Psi_frac = fractional_dictionary(l_int, k_int, gamma_L, Delta_K,F_MN, F_N, G_t, d_dd);
+        Psi_frac = fractional_dictionary(l_int, k_int, gamma_L, Delta_K,F_MN, F_N, G_r,G_t, d_dd);
         % 在分数字典上进行投影并找到最大索引
 
         proj_frac = Psi_frac(1:size(Psi,1),:)' * r_n; 
@@ -114,7 +114,7 @@ function [h_est, support_set] = ompfr_1(r, Psi, N_iter, epsilon, M, N, G_t, d_dd
     end
 end
 
-function Psi_frac = fractional_dictionary(l_int, k_int, gamma_L, Delta_K,F_MN, F_N,G_t,d_dd)
+function Psi_frac = fractional_dictionary(l_int, k_int, gamma_L, Delta_K,F_MN, F_N,G_r,G_t,d_dd)
     % 基于整数和分数延迟及多普勒生成分数字典
     % Psi: 整数字典
     % l_int, k_int: 延迟和多普勒的整数部分
@@ -122,7 +122,6 @@ function Psi_frac = fractional_dictionary(l_int, k_int, gamma_L, Delta_K,F_MN, F
     % G_t: 发射脉冲形状矩阵
     N = size(F_N,1);
     M = size(F_MN,1)/N;
-    G_r = G_t;
     Psi_frac = zeros(M*N, M * N);
     index = 1;
 
