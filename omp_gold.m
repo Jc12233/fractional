@@ -42,7 +42,7 @@ function [h_est, support_set] = omp_gold(r, Psi, N_iter, epsilon, M, N, G_r,G_t,
         l_int = l_int-1;
         k_int = k_int-1;
         
-        tic;
+        % tic;
         % 黄金分割比一维搜索
         l_left = l_int - 1;
         l_right = l_int + 1;
@@ -96,8 +96,8 @@ function [h_est, support_set] = omp_gold(r, Psi, N_iter, epsilon, M, N, G_r,G_t,
                 break;
             end
         end
-        disp("omp_gold用时：");
-        toc;
+        % disp("omp_gold用时：");
+        % toc;
         l_frac = (l_left+l_right)/2;
         k_frac = (k_left+k_right)/2;
         A = [A,phi];  % 使用分数字典更新近似矩阵

@@ -41,7 +41,7 @@ function [h_est, support_set] = ompfr_fast(r, Psi, N_iter, epsilon, M, N, G_r, G
         l_int = l_int-1;
         k_int = k_int-1;
         
-        tic;
+        % tic;
         % 生成分数字典        
         proj_frac = proj_fractional_dictionary(l_int, k_int, gamma_L, Delta_K,F_MN, F_N,G_r, G_t, d_dd,r_n);
         % 在分数字典上进行投影并找到最大索
@@ -50,8 +50,8 @@ function [h_est, support_set] = ompfr_fast(r, Psi, N_iter, epsilon, M, N, G_r, G
         l_frac = l_int-1 + (l_frac_ind-1)*2/M;
         k_frac = k_int-1 + (k_frac_ind-1)*2/N;
         [h,phi_refine] = proj_refinement_dictionary(l_frac, k_frac, gamma_L, Delta_K,F_MN, F_N,G_r,G_t,d_dd,r_n);
-        disp("ompfr_fast用时：");
-        toc;
+        % disp("ompfr_fast用时：");
+        % toc;
         % % 细化支撑集和残差的计算
         A = [A,phi_refine];  % 使用分数字典更新近似矩阵
         x = pinv(A)* r;  % 重新计算稀疏向量估计

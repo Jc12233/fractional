@@ -45,7 +45,7 @@ function [h_est, support_set] = omp_epoint(r, Psi, N_iter, epsilon, M, N, G_r,G_
         
         l_tmp = l_int;
         k_tmp = k_int;
-        tic;
+        % tic;
         for ind = 1:5
             % epoint
             C = (kron(F_N,G_r)*F_MN')'*r_n;
@@ -101,8 +101,8 @@ function [h_est, support_set] = omp_epoint(r, Psi, N_iter, epsilon, M, N, G_r,G_
             l_tmp = l_frac;
             k_tmp = k_frac;
         end
-        disp("omp_epoint用时：");
-        toc;
+        % disp("omp_epoint用时：");
+        % toc;
         phi = kron(F_N,G_r)*F_MN' * (gamma_L^l_frac) * F_MN * (Delta_K^k_frac) * kron(F_N',G_t)*d_dd;
         Phi_sel = [Phi_sel,phi];  % 使用分数字典更新近似矩阵
         x = pinv(Phi_sel)* r;  % 重新计算稀疏向量估计

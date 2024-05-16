@@ -40,7 +40,7 @@ function [h_est, support_set] = ompfr_1(r, Psi, N_iter, epsilon, M, N, G_r,G_t, 
         l_int = l_int-1;
         k_int = k_int-1;
         
-        tic;
+        % tic;
         % 生成分数字典        
         Psi_frac = fractional_dictionary(l_int, k_int, gamma_L, Delta_K,F_MN, F_N, G_r,G_t, d_dd);
         % 在分数字典上进行投影并找到最大索引
@@ -51,8 +51,8 @@ function [h_est, support_set] = ompfr_1(r, Psi, N_iter, epsilon, M, N, G_r,G_t, 
         [k_frac_ind, l_frac_ind] = ind2sub([M, N], idx_frac);
         l_frac = l_int-1 + (l_frac_ind-1)*2/M;
         k_frac = k_int-1 + (k_frac_ind-1)*2/N;
-        disp("ompfr用时：");
-        toc;
+        % disp("ompfr用时：");
+        % toc;
         
         %%
         % Psi_tmp(:,idx) = Psi_frac(1:size(Psi,1),idx_frac);
