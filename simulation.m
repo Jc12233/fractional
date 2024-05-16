@@ -6,7 +6,7 @@ N = 16;                         % 多普勒 bins 数量
 T = 1e-6;                       % 符号持续时间，单位：s
 T_guard = 0.1 * T;              % 保护间隔时间，单位：s
 
-K = 4;                          % 目标数量
+K = 1;                          % 目标数量
 
 c = 3e8;                        % 光速，单位：m/s
 fc = 24e9;                      % 载波频率，单位：Hz
@@ -70,9 +70,9 @@ Phi = kron(dftmtx(N),G_r)*construct_dictionary(M, N, G_t, D_dd);
 %Phi = load('data\parameter32.mat').Phi;      % 读取存储数据
 Phi_truncated = Phi(1:R, :);  % 对字典进行截断
 r_truncated = r(1:R);  % 对接收信号进行截断
-% h_est_epoint = omp_epoint(r_truncated, Phi_truncated, N_ite, epsilon, M, N, G_r,G_t, D_dd(:));
-% h_est_fibo = omp_fibo(r_truncated, Phi_truncated, N_ite, epsilon, M, N, G_r,G_t, D_dd(:));
-% h_est_fast = ompfr_fast(r_truncated, Phi_truncated, N_ite, epsilon, M, N, G_r,G_t, D_dd(:));
+h_est_epoint = omp_epoint(r_truncated, Phi_truncated, N_ite, epsilon, M, N, G_r,G_t, D_dd(:));
+h_est_fibo = omp_fibo(r_truncated, Phi_truncated, N_ite, epsilon, M, N, G_r,G_t, D_dd(:));
+h_est_fast = ompfr_fast(r_truncated, Phi_truncated, N_ite, epsilon, M, N, G_r,G_t, D_dd(:));
 % h_int =  omp(r_truncated, Phi_truncated, N_ite, epsilon, M, N);
 h_estimate = ompfr_1(r_truncated, Phi_truncated, N_ite, epsilon, M, N, G_r,G_t, D_dd(:));
 % for porjection plot:

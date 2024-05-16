@@ -105,7 +105,7 @@ function [h_est, support_set] = ompfr_1(r, Psi, N_iter, epsilon, M, N, G_r,G_t, 
 
         h_est_rel(iter,:) = [l_frac_rel, k_frac_rel];
         h_est(iter,:) = [l_frac, k_frac];  % 更新稀疏向量估计
-        norm(r_n)
+        % norm(r_n)
         % 检查停止准则
         if norm(r_n) < epsilon
             break;
