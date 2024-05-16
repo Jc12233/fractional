@@ -1,8 +1,8 @@
 clear;
-clc;
+
 % 参数设置
-M = 16;                         % 延迟 bins 数量
-N = 16;                         % 多普勒 bins 数量
+M = 32;                         % 延迟 bins 数量
+N = 32;                         % 多普勒 bins 数量
 T = 1e-6;                       % 符号持续时间，单位：s
 T_guard = 0.1 * T;              % 保护间隔时间，单位：s
 
@@ -23,7 +23,7 @@ epsilon = N*M*sigma2;     % 残差阈值
 % 物体数据
 range_data                      = [33.75, 50.625, 71.25, 97.5];                 % 距离（m）
 normalized_delay_data           = range_data/delta_R;           % 归一化延迟
-velocity_data                   = 4*[7.63, 38.15, 7.63, -30.52];               % 速度（m/s）
+velocity_data                   = [7.63, 38.15, 7.63, -30.52];               % 速度（m/s）
 normalized_doppler_shift_data   = N/2+velocity_data/delta_V; % 归一化多普勒频移（Hz）
 snr_data                        = [20, 15, 10, 5];                                 % 信噪比（dB）
 signal_pow                      = sqrt(10.^(snr_data/10)*sigma2);
