@@ -1,5 +1,6 @@
 function [h_est, support_set] = ompfr_fast(r, Psi, N_iter, epsilon, M, N, G_r, G_t, d_dd)
-% OMPFR - Orthogonal Matching Pursuit with Fractional Refinement
+% OMPFR -  该算法是通过3-step估计，第二次时采用快速网格求解，
+% 第三次使用1D-search获得更精确的结果。
 %
 % 参数:
 % r : 接收信号向量 (列向量)

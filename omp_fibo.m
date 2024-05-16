@@ -1,5 +1,5 @@
 function [h_est, support_set] = omp_fibo(r, Psi, N_iter, epsilon, M, N, G_r,G_t, d_dd)
-% OMPFR - Orthogonal Matching Pursuit with Fractional Refinement
+% OMP——fibo - 该算法是通过2-step估计，第二次时使用fibo序列求解。
 %
 % 参数:
 % r : 接收信号向量 (列向量)

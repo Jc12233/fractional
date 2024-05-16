@@ -1,5 +1,5 @@
 function [h_est, support_set] = omp_epoint(r, Psi, N_iter, epsilon, M, N, G_r,G_t, d_dd)
-% OMPFR - Orthogonal Matching Pursuit with Fractional Refinement
+% OMP_epoint - 该算法是通过2-step估计，第二次时使用内积加快求解速度。
 %
 % 参数:
 % r : 接收信号向量 (列向量)
